@@ -48,3 +48,29 @@ class Review(db.Model):
 
     customer = db.relationship('Customer', back_populates='reviews')
     item = db.relationship('Item', back_populates='reviews')
+
+# schemas
+
+class CustomerSchema(Schema):
+    id = fields.Int()
+    name = fields.String()
+
+    reviews = fields.Nested(lambda: ReviewSchema(exclude=('customer',)), many=True)
+    item = fields.Nested(lambda: ItemSchema(exclude=('customer',)))
+
+class ItemSchema(Schema):
+    id = fields.Int()
+    name = fields.String()
+    price = fields.Float()
+
+    customer = fields.Nested(CustomerSchema(exclude=('item',)))
+    reviews = fields.Nested(lambda: ReviewSchema(exclude=('item',)), many=True)    
+
+class ReviewSchema(Schema):
+    id = fields.Int()
+    comment = fields.String()
+    comment_id = fields.Int()
+    item_id = fields.Int()
+
+    customer = fields.Nested(CustomerSchema(exclude=('reviews',)))
+    item = fields.Nested(ItemSchema(exclude=('reviews',)))
